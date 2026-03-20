@@ -174,37 +174,32 @@
       </div>
     </el-dialog>
     <el-dialog v-model="showAdd" :title="$t('addUser')">
-      <div class="container">
-        <el-input v-model="addForm.email" type="text" :placeholder="$t('emailAccount')" autocomplete="off">
-          <template #append>
-            <div @click.stop="openSelect">
-              <el-select
-                  ref="mySelect"
-                  v-model="addForm.suffix"
-                  :placeholder="$t('select')"
-                  class="select"
-              >
-                <el-option
-                    v-for="item in domainList"
-                    :key="item"
-                    :label="item"
-                    :value="item"
-                />
-              </el-select>
-              <div>
-                <span>{{ addForm.suffix }}</span>
-                <Icon class="setting-icon" icon="mingcute:down-small-fill" width="20" height="20"/>
-              </div>
-            </div>
-          </template>
-        </el-input>
-        <el-input type="password" v-model="addForm.password" :placeholder="$t('password')"/>
-        <el-select v-model="addForm.type" :placeholder="$t('perm')">
-          <el-option v-for="item in roleList" :label="item.name" :value="item.roleId" :key="item.roleId"/>
-        </el-select>
-        <el-button class="btn" type="primary" @click="submit" :loading="addLoading"
-        >{{ $t('add') }}
-        </el-button>
+      <div class="add-user-form">
+        <div class="add-user-field">
+          <label class="add-user-label">{{ $t('emailAccount') }}</label>
+          <el-input v-model="addForm.email" type="text" :placeholder="$t('emailAccount')" autocomplete="off" />
+        </div>
+        <div class="add-user-field">
+          <label class="add-user-label">{{ $t('select') }}</label>
+          <el-select v-model="addForm.suffix" style="width: 100%">
+            <el-option v-for="item in domainList" :key="item" :label="item" :value="item"/>
+          </el-select>
+        </div>
+        <div class="add-user-field">
+          <label class="add-user-label">{{ $t('password') }}</label>
+          <el-input type="password" v-model="addForm.password" :placeholder="$t('password')" show-password />
+        </div>
+        <div class="add-user-field">
+          <label class="add-user-label">{{ $t('perm') }}</label>
+          <el-select v-model="addForm.type" :placeholder="$t('perm')" style="width: 100%">
+            <el-option v-for="item in roleList" :label="item.name" :value="item.roleId" :key="item.roleId"/>
+          </el-select>
+        </div>
+        <div class="add-user-preview" v-if="addForm.email">
+          <Icon icon="mingcute:mail-line" width="13" height="13" />
+          <span>{{ addForm.email }}{{ addForm.suffix }}</span>
+        </div>
+        <el-button class="btn" type="primary" @click="submit" :loading="addLoading">{{ $t('add') }}</el-button>
       </div>
     </el-dialog>
     <el-dialog class="account-dialog" v-model="accountShow" :title="t('userAccount')" @closed="resetAccountList" >
@@ -488,7 +483,6 @@ const pagerCount = ref(10)
 const settingLoading = ref(false)
 const tableLoading = ref(true)
 const roleList = reactive([])
-const mySelect = ref({})
 const accountList = reactive([])
 const accountParams = reactive({
   size: 10,
@@ -724,9 +718,7 @@ const tableRowFormatter = (data) => {
   return data.row.email
 }
 
-const openSelect = () => {
-  mySelect.value.toggleMenu()
-}
+
 
 function resetAddForm() {
   addForm.email = ''
@@ -1320,12 +1312,36 @@ function adjustWidth() {
   }
 }
 
-.select {
-  position: absolute;
-  right: 30px;
-  width: 100px;
-  opacity: 0;
-  pointer-events: none;
+.add-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 4px;
+}
+
+.add-user-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-user-label {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  font-weight: 500;
+}
+
+.add-user-preview {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: var(--el-fill-color-light);
+  border-radius: var(--el-border-radius-base);
+  font-size: 12.5px;
+  color: var(--el-color-primary);
+  font-family: monospace;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .loading {
@@ -1352,10 +1368,6 @@ function adjustWidth() {
   opacity: 0;
 }
 
-.setting-icon {
-  position: relative;
-  top: 6px;
-}
 
 .right-dropdown-item {
   display: flex;
