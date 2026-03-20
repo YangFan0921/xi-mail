@@ -12,6 +12,7 @@
         <div
           v-for="item in mainNav"
           :key="item.name"
+          v-if="!item.perm || hasPerm(item.perm)"
           class="nav-item"
           :class="{ active: route.meta.name === item.name }"
           @click="router.push({ name: item.name })"

@@ -1,5 +1,6 @@
 import BizError from '../error/biz-error';
 import accountService from './account-service';
+import accountEntity from '../entity/account';
 import settingService from './setting-service';
 import orm from '../entity/orm';
 import user from '../entity/user';
@@ -31,19 +32,37 @@ const userService = {
 			throw new BizError(t('authExpired'), 401);
 		}
 
-		const [account, roleRow, permKeys] = await Promise.all([
+		let [account, roleRow, permKeys] = await Promise.all([
 			accountService.selectByEmailIncludeDel(c, userRow.email),
 			roleService.selectById(c, userRow.type),
 			userRow.email === c.env.admin ? Promise.resolve(['*']) : permService.userPermKeys(c, userId)
 		]);
+
+		// Auto-create primary account for users who don't have one (e.g. migrated users)
+		if (!account) {
+			try {
+				account = await orm(c).insert(accountEntity)
+					.values({
+						email: userRow.email,
+						userId: userRow.userId,
+						name: emailUtils.getName(userRow.email),
+						isDel: isDel.NORMAL,
+					})
+					.returning()
+					.get();
+			} catch (e) {
+				// Insert failed (duplicate etc.), try selecting again
+				account = await accountService.selectByEmailIncludeDel(c, userRow.email);
+			}
+		}
 
 		const user = {};
 		user.userId = userRow.userId;
 		user.displayId = userRow.displayId;
 		user.sendCount = userRow.sendCount;
 		user.email = userRow.email;
-		user.account = account;
-		user.name = account.name;
+		user.account = account ?? {};
+		user.name = account?.name ?? userRow.email;
 		user.permKeys = permKeys;
 		user.role = roleRow;
 		user.type = userRow.type;

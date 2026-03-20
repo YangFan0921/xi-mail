@@ -116,23 +116,22 @@
     <!-- Add dialog -->
     <el-dialog v-model="showAdd" :title="$t('addAccount')">
       <div class="container">
-        <div style="display: flex; gap: 8px; align-items: stretch;">
-          <el-input v-model="addForm.email" ref="addRef" type="text" :placeholder="$t('emailAccount')" autocomplete="off" style="flex: 1;">
-            <template #append>
-              <div @click.stop="openSelect">
-                <el-select ref="mySelect" v-model="addForm.suffix" :placeholder="$t('select')" class="select">
-                  <el-option v-for="item in domainList" :key="item" :label="item" :value="item"/>
-                </el-select>
-                <div>
-                  <span>{{ addForm.suffix }}</span>
-                  <Icon class="setting-icon" icon="mingcute:down-small-fill" width="20" height="20"/>
-                </div>
-              </div>
-            </template>
-          </el-input>
+        <div class="email-input-row">
+          <el-input
+            v-model="addForm.email"
+            ref="addRef"
+            type="text"
+            :placeholder="$t('emailAccount')"
+            autocomplete="off"
+            class="email-prefix-input"
+          />
+          <span class="at-sign">@</span>
+          <el-select v-model="addForm.suffix" class="domain-select">
+            <el-option v-for="item in domainList" :key="item" :label="item" :value="item"/>
+          </el-select>
           <el-tooltip :content="$t('randomPrefix')" placement="top">
-            <el-button @click="randomizePrefix" style="height: auto;">
-              <Icon icon="mingcute:refresh-2-line" width="18" height="18" />
+            <el-button class="rand-btn" @click="randomizePrefix">
+              <Icon icon="mingcute:refresh-2-line" width="16" height="16" />
             </el-button>
           </el-tooltip>
         </div>
@@ -223,7 +222,6 @@ const addForm = reactive({
 });
 let skeletonRows = 8;
 const queryParams = { size: 50 };
-const mySelect = ref();
 
 const transferShow = ref(false);
 const transferLoading = ref(false);
@@ -248,7 +246,6 @@ watch(() => accountStore.changeUserAccountName, () => {
   if (accounts[0]) accounts[0].name = accountStore.changeUserAccountName;
 });
 
-const openSelect = () => { mySelect.value.toggleMenu(); };
 
 window.onTurnstileError = (e) => {
   if (verifyErrorCount >= 4) return;
@@ -378,7 +375,7 @@ function getAccountList() {
     let duration = Date.now() - start;
     if (duration < 200) await sleep(200 - duration);
     if (list.length < queryParams.size) noLoading.value = true;
-    if (accounts.length === 0) accountStore.currentAccount = list[0];
+    if (accounts.length === 0 && list[0]) accountStore.currentAccount = list[0];
     accounts.push(...list);
     loading.value = false;
     followLoading.value = false;
@@ -639,15 +636,32 @@ path[fill="#ffdda1"] { fill: #ffdd7d; }
   gap: 12px;
 }
 
-.setting-icon {
-  position: relative;
-  top: 6px;
-}
+.email-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
-:deep(.el-input-group__append) {
-  padding: 0 !important;
-  padding-left: 8px !important;
-  background: var(--el-bg-color);
+  .email-prefix-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .at-sign {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+    line-height: 1;
+  }
+
+  .domain-select {
+    width: 160px;
+    flex-shrink: 0;
+  }
+
+  .rand-btn {
+    flex-shrink: 0;
+    padding: 8px 10px;
+  }
 }
 
 :deep(.el-dialog) {
@@ -659,13 +673,6 @@ path[fill="#ffdda1"] { fill: #ffdd7d; }
   }
 }
 
-.select {
-  position: absolute;
-  right: 30px;
-  width: 100px;
-  opacity: 0;
-  pointer-events: none;
-}
 
 .add-email-turnstile { margin-top: 15px; }
 .turnstile-show { opacity: 1; }

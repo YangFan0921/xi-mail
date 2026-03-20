@@ -24,7 +24,8 @@ export async function email(message, env, ctx) {
 			ruleEmail,
 			ruleType,
 			r2Domain,
-			noRecipient
+			noRecipient,
+			domainMapping
 		} = await settingService.query({ env });
 
 		if (receive === settingConst.receive.CLOSE) {
@@ -32,6 +33,19 @@ export async function email(message, env, ctx) {
 			return;
 		}
 
+		// Apply domain mapping: replace the domain part of message.to if a mapping exists
+		// e.g. pk.azx.us → wdy.pkxi.sandbox.lib.uci.edu
+		let recipientTo = message.to;
+		if (domainMapping && typeof domainMapping === 'object') {
+			const atIdx = recipientTo.indexOf('@');
+			if (atIdx !== -1) {
+				const localPart = recipientTo.slice(0, atIdx);
+				const domainPart = recipientTo.slice(atIdx + 1);
+				if (domainMapping[domainPart]) {
+					recipientTo = `${localPart}@${domainMapping[domainPart]}`;
+				}
+			}
+		}
 
 		const reader = message.raw.getReader();
 		let content = '';
@@ -44,7 +58,15 @@ export async function email(message, env, ctx) {
 
 		const email = await PostalMime.parse(content);
 
-		const account = await accountService.selectByEmailIncludeDel({ env: env }, message.to);
+		// If domain mapping was applied, update the To list in the parsed email
+		// so the stored `recipient` field reflects the mapped address
+		if (recipientTo !== message.to && Array.isArray(email.to)) {
+			email.to = email.to.map(item =>
+				item.address === message.to ? { ...item, address: recipientTo } : item
+			);
+		}
+
+		const account = await accountService.selectByEmailIncludeDel({ env: env }, recipientTo);
 
 		if (!account && noRecipient === settingConst.noRecipient.CLOSE) {
 			message.setReject('Recipient not found');
@@ -61,7 +83,7 @@ export async function email(message, env, ctx) {
 
 			let { banEmail, availDomain } = await roleService.selectByUserId({ env: env }, account.userId);
 
-			if (!roleService.hasAvailDomainPerm(availDomain, message.to)) {
+			if (!roleService.hasAvailDomainPerm(availDomain, recipientTo)) {
 				message.setReject('The recipient is not authorized to use this domain.');
 				return;
 			}
@@ -75,13 +97,15 @@ export async function email(message, env, ctx) {
 
 
 		if (!email.to) {
-			email.to = [{ address: message.to, name: emailUtils.getName(message.to)}]
+			email.to = [{ address: recipientTo, name: emailUtils.getName(recipientTo)}]
 		}
 
-		const toName = email.to.find(item => item.address === message.to)?.name || '';
+		const toName = email.to.find(item => item.address === recipientTo)?.name
+			|| email.to.find(item => item.address === message.to)?.name
+			|| '';
 
 		const params = {
-			toEmail: message.to,
+			toEmail: recipientTo,
 			toName: toName,
 			sendEmail: email.from.address,
 			name: email.from.name || emailUtils.getName(email.from.address),
@@ -136,7 +160,7 @@ export async function email(message, env, ctx) {
 
 			const emails = ruleEmail.split(',');
 
-			if (!emails.includes(message.to)) {
+			if (!emails.includes(recipientTo)) {
 				return;
 			}
 
