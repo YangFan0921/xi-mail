@@ -1,0 +1,39 @@
+name = "cloud-mail"
+main = "src/index.js"
+compatibility_date = "2025-06-04"
+keep_vars = true
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "db"
+database_name = "cloud-mail"
+database_id = "f508af92-ac37-494a-bf7e-2c1789085d98"
+
+[[kv_namespaces]]
+binding = "kv"
+id = "13fccbba3fa54e1e8ba958367c813492"
+
+[[r2_buckets]]
+binding = "r2"
+bucket_name = "cloud-mail"
+
+[assets]
+binding = "assets"		#静态资源绑定名默认不可修改
+directory = "./dist"	#前端vue项目打包的静态资源存放位置,默认dist
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[triggers]
+crons = ["0 16 * * *"]	#定时任务每天晚上12点执行
+
+
+[vars]
+orm_log = false
+domain = ["nlfree.me","au-to.me","211799.xyz","52it.de","ahm.pp.ua","cvak.netlib.re","uiov.netlib.re","ali.edu.kg","azx.us","oaiu.pp.ua","ovvo.qzz.io","uao.pp.ua","uea.pp.ua","uu-uu.netlib.re","aoeu.netlib.re","idco.netlib.re","h7h.netlib.re","itoa.netlib.re","oaifree.netlib.re","xoui.netlib.re","c.6.7.b.0.d.0.0.1.0.a.2.ip6.arpa"]
+admin = "admin@azx.us"
+jwt_secret = "Z7f!xPq8mV@L2bC$r9X${JWT_SECRET}N1t"
+
+[build]
+command = "pnpm --prefix ../mail-view install && pnpm --prefix ../mail-view run build"
