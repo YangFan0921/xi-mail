@@ -33,6 +33,7 @@ With just a single domain managed by Cloudflare, you can deploy a full-featured 
 - Sidebar: dark minimal style with unified navigation icons
 - Header: compact layout, gradient Compose button, improved user info panel
 - Global design tokens: indigo-violet gradients, colored shadows, unified border-radius
+- **Header language toggle**: switch between Chinese / English instantly; preference is persisted
 
 ### 👤 User System Enhancements
 - **Display ID**: User IDs are now random alphanumeric strings (`xxxx-xxxx-xxxx`) instead of sequential integers
@@ -42,6 +43,7 @@ With just a single domain managed by Cloudflare, you can deploy a full-featured 
 ### 📬 Account Management Improvements
 - Inbox / Sent sidebar: search/filter support, shows full email address for easy multi-account distinction
 - Account actions dropdown always visible (includes Transfer entry)
+- **Sent / Drafts menu items**: automatically hidden in the sidebar when the user has no send permission or the role is banned from sending
 
 ### 🔄 Transfer Page (`/transfer`)
 - Dedicated sidebar page to initiate transfers and manage pending / sent transfer requests
@@ -54,12 +56,19 @@ With just a single domain managed by Cloudflare, you can deploy a full-featured 
 
 ### 🗂️ Batch Operations (User Management)
 - Batch ban, batch unban, batch delete selected users
+- Batch delete email accounts associated with a user
 
 ### ⚙️ System Settings Enhancements
 - **Global API Token**: Admins can enable and generate a global token; use the `x-admin-auth` header to query emails via API without login (`GET /api/admin/mails`)
-- **Email keyword blocklist**: Prevents regular users from registering email addresses containing sensitive keywords like `admin` (admins can bypass)
+- **Email keyword blocklist**: Prevents regular users from registering email addresses containing sensitive keywords like `admin` (admins bypass this check)
+- **Sender domain blacklist**: Block emails from specified sender domains; the system rejects them immediately to defend against email bombing attacks
+- **Turnstile admin bypass**: When Turnstile bot verification is enabled, the admin account is exempt from completing the challenge on registration and when adding email addresses
+- **Announcement dialog redesign**: Centered Dialog with custom title, width, and HTML content; obsolete position/offset/type/duration options removed
 - Domain mapping UI improvement: existing system domains shown for quick selection
 - Auto-ban months input alignment fix; removed redundant "Login Background" and "Login Opacity" settings
+
+### 🔍 Tooltip Coverage
+- All action icons (search, refresh, sort, batch operations, etc.) now have consistent Tooltip hints on hover
 
 ---
 
@@ -198,7 +207,7 @@ If this project helps you, consider supporting ongoing development:
 | Network | Address |
 |---------|---------|
 | BEP20 (BSC) | `0x555390f5c07cf76cc344f42612196e8669e3586b` |
-| TRC20 (TRON) | `TVqK4thJCsaaWvp1Dah9F5CFZ1iqw75f4G` |
+| TRC20 (TRON) | `TVqK4thJCsaaVvp1Dah9F5CFZ1iqw75f4G` |
 
 ---
 

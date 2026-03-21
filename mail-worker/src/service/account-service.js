@@ -83,15 +83,21 @@ const accountService = {
 
 		let addVerifyOpen = false
 
-		if (addEmailVerify === settingConst.addEmailVerify.OPEN) {
-			addVerifyOpen = true
-			await turnstileService.verify(c, token);
-		}
+		// Admin bypasses Turnstile verification
+		const currentUserEmail = c.get('user')?.email;
+		const isAdmin = currentUserEmail && currentUserEmail === c.env.admin;
 
-		if (addEmailVerify === settingConst.addEmailVerify.COUNT) {
-			addVerifyOpen = await verifyRecordService.isOpenAddVerify(c, addVerifyCount);
-			if (addVerifyOpen) {
-				await turnstileService.verify(c,token)
+		if (!isAdmin) {
+			if (addEmailVerify === settingConst.addEmailVerify.OPEN) {
+				addVerifyOpen = true
+				await turnstileService.verify(c, token);
+			}
+
+			if (addEmailVerify === settingConst.addEmailVerify.COUNT) {
+				addVerifyOpen = await verifyRecordService.isOpenAddVerify(c, addVerifyCount);
+				if (addVerifyOpen) {
+					await turnstileService.verify(c, token)
+				}
 			}
 		}
 

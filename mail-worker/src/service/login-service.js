@@ -118,15 +118,20 @@ const loginService = {
 
 		let regVerifyOpen = false
 
-		if (registerVerify === settingConst.registerVerify.OPEN) {
-			regVerifyOpen = true
-			await turnstileService.verify(c,token)
-		}
+		// Admin email bypasses Turnstile verification on registration
+		const isAdmin = email === c.env.admin;
 
-		if (registerVerify === settingConst.registerVerify.COUNT) {
-			regVerifyOpen = await verifyRecordService.isOpenRegVerify(c, regVerifyCount);
-			if (regVerifyOpen) {
-				await turnstileService.verify(c,token)
+		if (!isAdmin) {
+			if (registerVerify === settingConst.registerVerify.OPEN) {
+				regVerifyOpen = true
+				await turnstileService.verify(c, token)
+			}
+
+			if (registerVerify === settingConst.registerVerify.COUNT) {
+				regVerifyOpen = await verifyRecordService.isOpenRegVerify(c, regVerifyCount);
+				if (regVerifyOpen) {
+					await turnstileService.verify(c, token)
+				}
 			}
 		}
 

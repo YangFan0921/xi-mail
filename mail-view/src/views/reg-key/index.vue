@@ -1,7 +1,9 @@
 <template>
   <div class="reg-key">
     <div class="header-actions">
-      <Icon class="icon" icon="ion:add-outline" width="23" height="23" @click="openAdd"/>
+      <el-tooltip :content="$t('addItem')" placement="top">
+        <Icon class="icon" icon="ion:add-outline" width="23" height="23" @click="openAdd"/>
+      </el-tooltip>
       <div class="search">
         <el-input
             v-model="params.code"
@@ -10,9 +12,15 @@
         >
         </el-input>
       </div>
-      <Icon class="icon" icon="iconoir:search" @click="search" width="20" height="20"/>
-      <Icon class="icon" icon="ion:reload" width="18" height="18" @click="refresh"/>
-      <Icon class="icon" icon="fluent:broom-sparkle-16-regular" width="22" height="22" @click="clearNotUse"/>
+      <el-tooltip :content="$t('searchAction')" placement="top">
+        <Icon class="icon" icon="iconoir:search" @click="search" width="20" height="20"/>
+      </el-tooltip>
+      <el-tooltip :content="$t('refresh')" placement="top">
+        <Icon class="icon" icon="ion:reload" width="18" height="18" @click="refresh"/>
+      </el-tooltip>
+      <el-tooltip :content="$t('clearUnused')" placement="top">
+        <Icon class="icon" icon="fluent:broom-sparkle-16-regular" width="22" height="22" @click="clearNotUse"/>
+      </el-tooltip>
     </div>
 
     <el-scrollbar class="scrollbar">

@@ -1,7 +1,9 @@
 <template>
   <div class="user-box">
     <div class="header-actions">
-      <Icon class="icon" icon="ion:add-outline" width="23" height="23" @click="openAdd"/>
+      <el-tooltip :content="$t('addUser')" placement="top">
+        <Icon class="icon" icon="ion:add-outline" width="23" height="23" @click="openAdd"/>
+      </el-tooltip>
       <div class="search">
         <el-input
             v-model="params.email"
@@ -17,16 +19,22 @@
         <el-option :key="1" :label="$t('banned')" :value="1"/>
         <el-option :key="-2" :label="$t('deleted')" :value="-2"/>
       </el-select>
-      <Icon class="icon" icon="iconoir:search" @click="search" width="20" height="20"/>
-      <Icon class="icon" @click="changeTimeSort" icon="material-symbols-light:timer-arrow-down-outline"
-            v-if="params.timeSort === 1" width="28" height="28"/>
-      <Icon class="icon" @click="changeTimeSort" icon="material-symbols-light:timer-arrow-up-outline" v-else width="28"
-            height="28"/>
+      <el-tooltip :content="$t('searchAction')" placement="top">
+        <Icon class="icon" icon="iconoir:search" @click="search" width="20" height="20"/>
+      </el-tooltip>
+      <el-tooltip :content="$t('sortByTime')" placement="top">
+        <Icon class="icon" @click="changeTimeSort" icon="material-symbols-light:timer-arrow-down-outline"
+              v-if="params.timeSort === 1" width="28" height="28"/>
+        <Icon class="icon" @click="changeTimeSort" icon="material-symbols-light:timer-arrow-up-outline" v-else width="28"
+              height="28"/>
+      </el-tooltip>
       <el-tooltip :content="$t('sortByLogin')" placement="top">
         <Icon class="icon" @click="changeLoginSort" icon="mingcute:time-line" width="20" height="20"
               :style="params.loginSort ? 'color: var(--el-color-primary)' : ''" />
       </el-tooltip>
-      <Icon class="icon" icon="ion:reload" width="18" height="18" @click="refresh"/>
+      <el-tooltip :content="$t('refresh')" placement="top">
+        <Icon class="icon" icon="ion:reload" width="18" height="18" @click="refresh"/>
+      </el-tooltip>
       <el-tooltip :content="$t('batchBan')" placement="top">
         <Icon class="icon" icon="ion:ban-outline" width="19" height="19" @click="batchBan"/>
       </el-tooltip>

@@ -11,7 +11,7 @@
       <nav class="nav-section">
         <template v-for="item in mainNav" :key="item.name">
         <div
-          v-if="!item.perm || hasPerm(item.perm)"
+          v-if="item.sendOnly ? canSend : (!item.perm || hasPerm(item.perm))"
           class="nav-item"
           :class="{ active: route.meta.name === item.name }"
           @click="router.push({ name: item.name })"
@@ -55,20 +55,31 @@
 <script setup>
 import router from "@/router/index.js";
 import { useRoute } from "vue-router";
+import { computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { useSettingStore } from "@/store/setting.js";
+import { useUserStore } from "@/store/user.js";
 import { useTransferStore } from "@/store/transfer.js";
 import { transferPendingList } from "@/request/account-transfer.js";
 import { hasPerm } from "@/perm/perm.js";
 
 const settingStore = useSettingStore();
+const userStore = useUserStore();
 const transferStore = useTransferStore();
 const route = useRoute();
 
+// Send/draft items are hidden if: global send is disabled, role is banned, or no email:send permission
+const canSend = computed(() => {
+  if (settingStore.settings.send === 1) return false;
+  const role = userStore.user?.role;
+  if (role?.sendType === 'ban') return false;
+  return hasPerm('email:send');
+});
+
 const mainNav = [
   { name: 'email', icon: 'mingcute:inbox-line', label: 'inbox' },
-  { name: 'send', icon: 'mingcute:send-line', label: 'sent', perm: "'email:send'" },
-  { name: 'draft', icon: 'mingcute:file-line', label: 'drafts', perm: "'email:send'" },
+  { name: 'send', icon: 'mingcute:send-line', label: 'sent', sendOnly: true },
+  { name: 'draft', icon: 'mingcute:file-line', label: 'drafts', sendOnly: true },
   { name: 'star', icon: 'mingcute:star-line', label: 'starred' },
   { name: 'setting', icon: 'mingcute:settings-3-line', label: 'settings' },
   { name: 'transfer', icon: 'mingcute:transfer-3-line', label: 'transferPending' },
