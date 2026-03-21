@@ -8,21 +8,53 @@
       </keep-alive>
     </router-view>
   </div>
+
+  <!-- 公告弹窗 -->
+  <el-dialog
+    v-model="noticeVisible"
+    :width="noticeDialogWidth"
+    class="notice-dialog"
+    align-center
+    destroy-on-close
+    :show-close="false"
+  >
+    <template #header>
+      <div class="notice-header">
+        <div class="notice-header-icon">
+          <Icon icon="mingcute:announcement-line" width="22" height="22" />
+        </div>
+        <div class="notice-header-text">
+          <span class="notice-title">{{ noticeData.title || $t('announcement') }}</span>
+        </div>
+        <Icon class="notice-close" icon="mingcute:close-line" width="18" height="18" @click="noticeVisible = false" />
+      </div>
+    </template>
+    <div class="notice-body" v-html="noticeData.content"></div>
+    <template #footer>
+      <el-button type="primary" class="notice-confirm-btn" @click="noticeVisible = false">
+        {{ $t('confirm') }}
+      </el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import account from '@/layout/account/index.vue'
 import { useUiStore } from "@/store/ui.js";
 import { useSettingStore } from "@/store/setting.js";
-import { computed, onBeforeUnmount, onMounted, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from 'vue-router'
 import { hasPerm } from "@/perm/perm.js"
+import { Icon } from '@iconify/vue'
 
 const settingStore = useSettingStore()
 const uiStore = useUiStore();
 const route = useRoute()
 let innerWidth = window.innerWidth
-let elNotification = null
+
+const noticeVisible = ref(false)
+const noticeData = ref({ title: '', content: '' })
+const noticeDialogWidth = ref('520px')
 
 const accountShow = computed(() => {
   return uiStore.accountShow && settingStore.settings.manyEmail === 0
@@ -35,39 +67,25 @@ watch(() => uiStore.changeNotice, () => {
     noticeWidth: settings.noticeWidth,
     noticeTitle: settings.noticeTitle,
     noticeContent: settings.noticeContent,
-    noticeType: settings.noticeType,
-    noticeDuration: settings.noticeDuration,
-    noticePosition: settings.noticePosition,
-    noticeOffset: settings.noticeOffset
   })
 })
 
 watch(() => uiStore.changePreview, () => {
-  showNotice(uiStore.previewData)
+  const d = uiStore.previewData
+  showNotice({
+    notice: d.notice,
+    noticeWidth: d.noticeWidth,
+    noticeTitle: d.noticeTitle,
+    noticeContent: d.noticeContent,
+  })
 })
 
 function showNotice(data) {
   if (data.notice === 1) return;
-  if (elNotification) elNotification.close()
-
-  const style = document.createElement('style');
-  style.innerHTML = `
-  .custom-notice.el-notification {
-    --el-notification-width: min(${data.noticeWidth}px,calc(100% - 30px)) !important;
-  }
-  `;
-  document.head.appendChild(style);
-
-  elNotification = ElNotification({
-    title: data.noticeTitle,
-    message: `<div style="width: 100%;height: 100%;">${data.noticeContent}</div>`,
-    type: data.noticeType === 'none' ? '' : data.noticeType,
-    duration: data.noticeDuration,
-    position: data.noticePosition,
-    offset: data.noticeOffset,
-    dangerouslyUseHTMLString: true,
-    customClass: 'custom-notice'
-  })
+  const w = Number(data.noticeWidth) || 520;
+  noticeDialogWidth.value = `min(${w}px, calc(100vw - 40px))`;
+  noticeData.value = { title: data.noticeTitle || '', content: data.noticeContent || '' };
+  noticeVisible.value = true;
 }
 
 onMounted(() => {
@@ -151,5 +169,88 @@ const handleResize = () => {
 .main-view {
   background: var(--el-bg-color);
   overflow: auto;
+}
+</style>
+
+<style>
+.notice-dialog.el-dialog {
+  border-radius: 16px !important;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.notice-dialog .el-dialog__header {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.notice-dialog .el-dialog__body {
+  padding: 20px 24px 8px !important;
+}
+
+.notice-dialog .el-dialog__footer {
+  padding: 12px 24px 20px !important;
+  text-align: center;
+}
+
+.notice-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  background: linear-gradient(135deg, var(--el-color-primary-light-7) 0%, var(--el-color-primary-light-9) 100%);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.notice-header-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--el-color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notice-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notice-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  line-height: 1.4;
+}
+
+.notice-close {
+  cursor: pointer;
+  color: var(--el-text-color-secondary);
+  font-size: 16px;
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.notice-close:hover {
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
+}
+
+.notice-dialog .notice-body {
+  max-height: 55vh;
+  overflow-y: auto;
+  line-height: 1.8;
+  font-size: 14px;
+  word-break: break-word;
+  color: var(--el-text-color-regular);
+}
+
+.notice-confirm-btn {
+  min-width: 100px;
+  border-radius: 8px !important;
 }
 </style>

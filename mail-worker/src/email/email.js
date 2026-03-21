@@ -25,12 +25,26 @@ export async function email(message, env, ctx) {
 			ruleType,
 			r2Domain,
 			noRecipient,
-			domainMapping
+			domainMapping,
+			senderDomainBlacklist
 		} = await settingService.query({ env });
 
 		if (receive === settingConst.receive.CLOSE) {
 			message.setReject('Service suspended');
 			return;
+		}
+
+		// Block emails from blacklisted sender domains
+		if (senderDomainBlacklist && senderDomainBlacklist.length > 0) {
+			const senderFrom = message.from || '';
+			const atIdx = senderFrom.lastIndexOf('@');
+			if (atIdx !== -1) {
+				const senderDomain = senderFrom.slice(atIdx + 1).toLowerCase().trim().replace(/[>)]+$/, '');
+				if (senderDomainBlacklist.some(d => senderDomain === d.toLowerCase().trim())) {
+					message.setReject('Sender domain blocked');
+					return;
+				}
+			}
 		}
 
 		// Apply domain mapping: replace the domain part of message.to if a mapping exists

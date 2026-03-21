@@ -91,15 +91,15 @@
                   <div class="user-info" v-if="showUserInfo">
                     <div class="user">
                       <span>
-                        <Icon icon="mynaui:user" width="20" height="20"/>
+                        <Icon icon="mingcute:send-line" width="16" height="16"/>
                       </span>
-                      <span>{{ item.userEmail }}</span>
+                      <span>{{ item.sendEmail }}</span>
                     </div>
                     <div class="account">
                       <span>
-                        <Icon icon="mdi-light:email" width="20" height="20"/>
+                        <Icon icon="mingcute:inbox-line" width="16" height="16"/>
                       </span>
-                      <span>{{ item.type === 0 ? item.toEmail : item.sendEmail }}</span>
+                      <span>{{ item.toEmail }}</span>
                     </div>
                   </div>
                 </div>

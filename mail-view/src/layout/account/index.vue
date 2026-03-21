@@ -642,6 +642,12 @@ path[fill="#ffdda1"] { fill: #ffdd7d; }
   width: 100%;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .add-form {
   display: flex;
   flex-direction: column;

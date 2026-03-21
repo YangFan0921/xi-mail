@@ -10,6 +10,10 @@
     </div>
 
     <div class="toolbar">
+      <button class="tool-btn lang-btn" @click="toggleLang" :aria-label="settingStore.lang === 'zh' ? 'Switch to English' : '切换为中文'">
+        <span class="lang-label">{{ settingStore.lang === 'zh' ? 'EN' : '中' }}</span>
+      </button>
+
       <button v-if="uiStore.dark" class="tool-btn" @click="openDark($event)" aria-label="Light mode">
         <Icon icon="mingcute:sun-fill" width="18" height="18" />
       </button>
@@ -87,6 +91,7 @@ import {useSettingStore} from "@/store/setting.js";
 import {hasPerm} from "@/perm/perm.js"
 import {useI18n} from "vue-i18n";
 import {setExtend} from "@/utils/day.js"
+import i18n from "@/i18n/index.js"
 
 const {t} = useI18n();
 const route = useRoute();
@@ -169,6 +174,13 @@ function switchDark(nextIsDark, root) {
   const isMobile = !window.matchMedia("(pointer: fine) and (hover: hover)").matches;
   metaTag.setAttribute('content', nextIsDark ? (isMobile ? '#141414' : '#000000') : (isMobile ? '#FFFFFF' : '#F1F1F1'));
   uiStore.dark = nextIsDark
+}
+
+function toggleLang() {
+  const next = settingStore.lang === 'zh' ? 'en' : 'zh'
+  settingStore.lang = next
+  i18n.global.locale.value = next
+  setExtend(next === 'zh' ? 'zh-cn' : 'en')
 }
 
 function openSend() { uiStore.writerRef.open() }
@@ -276,6 +288,20 @@ function formatName(email) {
     background: var(--base-fill);
     color: var(--el-text-color-primary);
   }
+}
+
+.lang-btn {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.lang-label {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  letter-spacing: 0.4px;
 }
 
 .avatar-btn {

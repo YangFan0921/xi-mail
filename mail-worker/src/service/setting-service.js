@@ -71,6 +71,7 @@ const settingService = {
 
 		setting.emailPrefixFilter = setting.emailPrefixFilter.split(",").filter(Boolean);
 		setting.emailKeywordBlacklist = (setting.emailKeywordBlacklist || '').split(",").filter(Boolean);
+		setting.senderDomainBlacklist = (setting.senderDomainBlacklist || '').split(",").filter(Boolean);
 		if (typeof setting.domainMapping === 'string') {
 			setting.domainMapping = JSON.parse(setting.domainMapping || '{}');
 		}
@@ -134,6 +135,10 @@ const settingService = {
 
 		if (Array.isArray(params.emailKeywordBlacklist)) {
 			params.emailKeywordBlacklist = params.emailKeywordBlacklist + '';
+		}
+
+		if (Array.isArray(params.senderDomainBlacklist)) {
+			params.senderDomainBlacklist = params.senderDomainBlacklist + '';
 		}
 
 		if (params.domainMapping && typeof params.domainMapping === 'object') {

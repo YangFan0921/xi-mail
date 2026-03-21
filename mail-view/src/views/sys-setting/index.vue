@@ -113,6 +113,19 @@
                   </el-button>
                 </div>
               </div>
+              <div class="setting-item">
+                <div>
+                  <span>{{ $t('senderDomainBlacklist') }}</span>
+                  <el-tooltip effect="dark" :content="$t('senderDomainBlacklistDesc')">
+                    <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+                  </el-tooltip>
+                </div>
+                <div class="forward">
+                  <el-button class="opt-button" size="small" type="primary" @click="senderDomainBlacklistShow = true">
+                    <Icon icon="fluent:settings-48-regular" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
 
             </div>
           </div>
@@ -690,50 +703,14 @@
       <el-dialog top="5vh" v-model="noticePopupShow" :title="$t('noticePopup')" class="notice-popup"
                  @closed="resetNoticeForm">
         <form>
-          <el-input v-model="noticeForm.noticeTitle" :placeholder="t('titleDesc')"/>
-          <div class="notice-line-item">
-            <el-select v-model="noticeForm.noticeType">
-              <template #prefix>
-                <span style="margin-right: 10px">{{ $t('icon') }}</span>
-              </template>
-              <el-option key="none" label="None" value="none"/>
-              <el-option key="primary" label="Primary" value="primary"/>
-              <el-option key="success" label="Success" value="success"/>
-              <el-option key="warning" label="Warning" value="warning"/>
-              <el-option key="info" label="Info" value="info"/>
-            </el-select>
-            <el-select v-model="noticeForm.noticePosition">
-              <template #prefix>
-                <span style="margin-right: 10px">{{ $t('position') }}</span>
-              </template>
-              <el-option key="top-left" :label="t('topLeft')" value="top-left"/>
-              <el-option key="top-right" :label="t('topRight')" value="top-right"/>
-              <el-option key="bottom-left" :label="t('bottomLeft')" value="bottom-left"/>
-              <el-option key="bottom-right" :label="t('bottomRight')" value="bottom-right"/>
-            </el-select>
-            <el-input-number v-model="noticeForm.noticeWidth">
-              <template #prefix>
-                {{ $t('width') }}
-              </template>
-              <template #suffix>
-                px
-              </template>
-            </el-input-number>
-            <el-input-number v-model="noticeForm.noticeOffset">
-              <template #prefix>
-                {{ $t('offset') }}
-              </template>
-              <template #suffix>
-                px
-              </template>
-            </el-input-number>
-            <el-input-number v-model="noticeForm.noticeDuration">
-              <template #prefix>
-                {{ $t('duration') }}
-              </template>
-              <template #suffix>
-                ms
-              </template>
+          <div class="notice-form-row">
+            <span class="notice-form-label">{{ $t('title') }}</span>
+            <el-input v-model="noticeForm.noticeTitle" :placeholder="t('titleDesc')"/>
+          </div>
+          <div class="notice-form-row">
+            <span class="notice-form-label">{{ $t('width') }}</span>
+            <el-input-number v-model="noticeForm.noticeWidth" :min="300" :max="1200" style="width:100%">
+              <template #suffix>px</template>
             </el-input-number>
           </div>
           <div class="notice-popup-item">
@@ -843,6 +820,13 @@
           <el-button type="primary" style="width: 100%;" :loading="settingLoading" @click="saveKeywordBlacklist">{{ $t('save') }}</el-button>
         </div>
       </el-dialog>
+      <el-dialog v-model="senderDomainBlacklistShow" :title="t('senderDomainBlacklist')" @closed="resetSenderDomainBlacklist">
+        <div class="keyword-blacklist">
+          <div style="margin-bottom: 10px; font-size: 13px; color: var(--el-text-color-secondary);">{{ t('senderDomainBlacklistHint') }}</div>
+          <el-input-tag style="margin-bottom: 10px;" v-model="senderDomainBlacklistData" :placeholder="t('senderDomainBlacklistPlaceholder')" />
+          <el-button type="primary" style="width: 100%;" :loading="settingLoading" @click="saveSenderDomainBlacklist">{{ $t('save') }}</el-button>
+        </div>
+      </el-dialog>
     </el-scrollbar>
   </div>
 </template>
@@ -866,7 +850,7 @@ defineOptions({
   name: 'sys-setting'
 })
 
-const currentVersion = 'v1.0.0'
+const currentVersion = 'v1.0.1'
 const hasUpdate = ref(false)
 let getUpdateErrorCount = 1;
 const {t, locale} = useI18n();
@@ -898,6 +882,8 @@ const newMappingSource = ref('')
 const newMappingDisplay = ref('')
 const keywordBlacklistShow = ref(false)
 const keywordBlacklistData = ref([])
+const senderDomainBlacklistShow = ref(false)
+const senderDomainBlacklistData = ref([])
 const systemDomains = computed(() => {
   return (settingStore.domainList || []).map(d => d.replace(/^@/, ''))
 })
@@ -1032,6 +1018,9 @@ function getSettings() {
     keywordBlacklistData.value = Array.isArray(setting.value.emailKeywordBlacklist)
       ? [...setting.value.emailKeywordBlacklist]
       : (setting.value.emailKeywordBlacklist || '').split(',').filter(Boolean)
+    senderDomainBlacklistData.value = Array.isArray(setting.value.senderDomainBlacklist)
+      ? [...setting.value.senderDomainBlacklist]
+      : (setting.value.senderDomainBlacklist || '').split(',').filter(Boolean)
     resendTokenForm.domain = setting.value.domainList[0]
     minEmailPrefix.value = setting.value.minEmailPrefix
     firstLoading.value = false
@@ -1335,6 +1324,17 @@ function saveKeywordBlacklist() {
   keywordBlacklistShow.value = false
 }
 
+function resetSenderDomainBlacklist() {
+  senderDomainBlacklistData.value = Array.isArray(setting.value.senderDomainBlacklist)
+    ? [...setting.value.senderDomainBlacklist]
+    : (setting.value.senderDomainBlacklist || '').split(',').filter(Boolean)
+}
+
+function saveSenderDomainBlacklist() {
+  editSetting({ senderDomainBlacklist: senderDomainBlacklistData.value }, true)
+  senderDomainBlacklistShow.value = false
+}
+
 function saveTurnstileKey() {
   const settingForm = {}
   settingForm.siteKey = turnstileForm.siteKey
@@ -1429,6 +1429,7 @@ function editSetting(settingForm, refreshStatus = true) {
     addS3Show.value = false
     emailPrefixShow.value = false
     keywordBlacklistShow.value = false
+    senderDomainBlacklistShow.value = false
   }).catch((e) => {
     setting.value = {...setting.value, ...JSON.parse(backup)}
   }).finally(() => {
@@ -1759,8 +1760,25 @@ function editSetting(settingForm, refreshStatus = true) {
   justify-content: space-between;
 }
 
+.notice-form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  .notice-form-label {
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap;
+    min-width: 48px;
+  }
+  .el-input, .el-input-number {
+    flex: 1;
+  }
+}
+
 .notice-popup-item {
-  margin-top: 15px;
+  margin-top: 8px;
 }
 
 .notice-line-item {
