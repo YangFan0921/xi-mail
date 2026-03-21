@@ -3,9 +3,8 @@ import result from '../model/result';
 import KvConst from '../const/kv-const';
 import orm from '../entity/orm';
 import email from '../entity/email';
-import account from '../entity/account';
 import BizError from '../error/biz-error';
-import { and, eq, desc, like, count } from 'drizzle-orm';
+import { and, eq, desc, count } from 'drizzle-orm';
 import { isDel } from '../const/entity-const';
 
 /** Verify x-admin-auth header against stored global token */
@@ -42,15 +41,6 @@ app.get('/admin/mails', async (c) => {
 
 	const db = orm(c);
 
-	const acct = await db.select()
-		.from(account)
-		.where(and(eq(account.email, address), eq(account.isDel, isDel.NORMAL)))
-		.get();
-
-	if (!acct) {
-		return c.json({ results: [], count: 0 });
-	}
-
 	const [rows, countRow] = await Promise.all([
 		db.select({
 			emailId:   email.emailId,
@@ -67,7 +57,7 @@ app.get('/admin/mails', async (c) => {
 		})
 		.from(email)
 		.where(and(
-			eq(email.accountId, acct.accountId),
+			eq(email.toEmail, address),
 			eq(email.isDel, isDel.NORMAL),
 		))
 		.orderBy(desc(email.emailId))
@@ -77,7 +67,7 @@ app.get('/admin/mails', async (c) => {
 		db.select({ total: count() })
 		.from(email)
 		.where(and(
-			eq(email.accountId, acct.accountId),
+			eq(email.toEmail, address),
 			eq(email.isDel, isDel.NORMAL),
 		))
 		.get(),
