@@ -244,8 +244,10 @@ const settingService = {
 			linuxdoSwitch: settingRow.linuxdoSwitch,
 			minEmailPrefix: settingRow.minEmailPrefix,
 			randomPrefixLength: settingRow.randomPrefixLength,
-			emailKeywordBlacklist: settingRow.emailKeywordBlacklist || [],
-			domainMapping: settingRow.domainMapping || {}
+		emailKeywordBlacklist: settingRow.emailKeywordBlacklist || [],
+		domainMapping: settingRow.domainMapping || {},
+		regKeyHint: settingRow.regKeyHint || '',
+		regKeyLink: settingRow.regKeyLink || ''
 		};
 	}
 };

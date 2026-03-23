@@ -128,6 +128,13 @@
                 <input v-model="registerForm.code" type="text" autocomplete="off"
                   :placeholder="settingStore.settings.regKey === 0 ? $t('regKey') : $t('regKeyOptional')" />
               </div>
+              <div class="reg-key-tips">
+                <span v-if="settingStore.settings.regKeyHint" class="reg-key-hint">{{ settingStore.settings.regKeyHint }}</span>
+                <a v-if="settingStore.settings.regKeyLink" class="reg-key-link" :href="settingStore.settings.regKeyLink" target="_blank" rel="noopener noreferrer">
+                  <Icon icon="mingcute:external-link-line" width="13" height="13" />
+                  {{ $t('getRegKey') }}
+                </a>
+              </div>
             </div>
 
             <div v-show="verifyShow" class="register-turnstile"
@@ -630,6 +637,34 @@ function submitRegister() {
     font-weight: 600;
     color: var(--el-text-color-secondary);
     letter-spacing: 0.01em;
+  }
+}
+
+.reg-key-tips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.reg-key-hint {
+  font-size: 12px;
+  color: var(--el-text-color-placeholder);
+}
+
+.reg-key-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--el-color-primary);
+  text-decoration: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.75;
+    text-decoration: underline;
   }
 }
 

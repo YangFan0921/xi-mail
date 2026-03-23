@@ -42,6 +42,40 @@
                   </el-select>
                 </div>
               </div>
+              <div class="setting-item" v-if="setting.regKey === 0 || setting.regKey === 2">
+                <div>
+                  <span>{{ $t('regKeyHint') }}</span>
+                  <el-tooltip effect="dark" :content="$t('regKeyHintDesc')">
+                    <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+                  </el-tooltip>
+                </div>
+                <div class="forward">
+                  <el-input
+                    v-model="setting.regKeyHint"
+                    :placeholder="$t('regKeyHintPlaceholder')"
+                    style="width: 200px;"
+                    clearable
+                    @change="change"
+                  />
+                </div>
+              </div>
+              <div class="setting-item" v-if="setting.regKey === 0 || setting.regKey === 2">
+                <div>
+                  <span>{{ $t('regKeyLink') }}</span>
+                  <el-tooltip effect="dark" :content="$t('regKeyLinkDesc')">
+                    <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+                  </el-tooltip>
+                </div>
+                <div class="forward">
+                  <el-input
+                    v-model="setting.regKeyLink"
+                    :placeholder="$t('regKeyLinkPlaceholder')"
+                    style="width: 200px;"
+                    clearable
+                    @change="change"
+                  />
+                </div>
+              </div>
               <div class="setting-item">
                 <div><span>{{ $t('addAccount') }}</span></div>
                 <div>
@@ -850,7 +884,7 @@ defineOptions({
   name: 'sys-setting'
 })
 
-const currentVersion = 'v1.0.3'
+const currentVersion = 'v1.0.4'
 const hasUpdate = ref(false)
 let getUpdateErrorCount = 1;
 const {t, locale} = useI18n();

@@ -63,6 +63,7 @@ With just a single domain managed by Cloudflare, you can deploy a full-featured 
 - **Email keyword blocklist**: Prevents regular users from registering email addresses containing sensitive keywords like `admin` (admins bypass this check)
 - **Sender domain blacklist**: Block emails from specified sender domains; the system rejects them immediately to defend against email bombing attacks
 - **Turnstile admin bypass**: When Turnstile bot verification is enabled, the admin account is exempt from completing the challenge on registration and when adding email addresses
+- **Registration code hint & link**: When registration codes are required, admins can configure a hint message (e.g. "Contact admin to get one") and an external link shown as "Get Registration Code" on the register page
 - **Announcement dialog redesign**: Centered Dialog with custom title, width, and HTML content; obsolete position/offset/type/duration options removed
 - Domain mapping UI improvement: existing system domains shown for quick selection
 - Auto-ban months input alignment fix; removed redundant "Login Background" and "Login Opacity" settings

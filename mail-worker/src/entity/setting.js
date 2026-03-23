@@ -52,6 +52,8 @@ export const setting = sqliteTable('setting', {
 	randomPrefixLength: integer('random_prefix_length').default(8).notNull(),
 	domainMapping: text('domain_mapping').default('{}').notNull(),
 	emailKeywordBlacklist: text('email_keyword_blacklist').default('').notNull(),
-	senderDomainBlacklist: text('sender_domain_blacklist').default('').notNull()
+	senderDomainBlacklist: text('sender_domain_blacklist').default('').notNull(),
+	regKeyHint: text('reg_key_hint').default('').notNull(),
+	regKeyLink: text('reg_key_link').default('').notNull()
 });
 export default setting
