@@ -162,13 +162,6 @@
         </Transition>
       </div>
 
-      <!-- Footer below card -->
-      <div class="page-footer" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1, transition: { delay: 300 } }">
-        <a href="https://github.com/PastKing/xi-mail" target="_blank">
-          <Icon icon="mingcute:github-line" width="14" height="14" />
-          <span>{{ $t('openSource') }}</span>
-        </a>
-      </div>
     </div>
 
     <!-- OAuth bind dialog -->
@@ -849,23 +842,6 @@ function submitRegister() {
     border-color: var(--el-border-color-hover);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-}
-
-/* ── Footer ── */
-.page-footer {
-  margin-top: 14px;
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11.5px;
-    color: var(--el-text-color-placeholder);
-    text-decoration: none;
-    transition: color 0.15s;
-
-    &:hover { color: var(--el-text-color-secondary); }
   }
 }
 
