@@ -497,66 +497,6 @@
             </div>
           </div>
 
-          <div class="settings-card about">
-            <div class="card-title">{{ $t('about') }}</div>
-            <div class="card-content">
-              <div class="concerning-item">
-                <span>{{ $t('version') }} :</span>
-                <el-badge is-dot :hidden="!hasUpdate">
-                  <el-button @click="jump('https://github.com/PastKing/xi-mail/releases')">
-                    {{ currentVersion }}
-                    <template #icon>
-                      <Icon icon="qlementine-icons:version-control-16" style="font-size: 20px" color="#1890FF"/>
-                    </template>
-                  </el-button>
-                </el-badge>
-              </div>
-              <div class="concerning-item">
-                <span>{{ $t('community') }} : </span>
-                <div class="community">
-                  <el-button @click="jump('https://github.com/PastKing/xi-mail')">
-                    Github
-                    <template #icon>
-                      <Icon icon="codicon:github-inverted" width="22" height="22"/>
-                    </template>
-                  </el-button>
-                  <el-button @click="jump('https://t.me/pk_oa')">
-                    Telegram
-                    <template #icon>
-                      <Icon icon="logos:telegram" width="30" height="30"/>
-                    </template>
-                  </el-button>
-                </div>
-              </div>
-              <div class="concerning-item">
-                <span>{{ $t('donate') }} : </span>
-                <div class="donate-box">
-                  <div class="donate-row">
-                    <span class="donate-chain bep20">BEP20</span>
-                    <code class="donate-addr" @click="copyAddr('0x555390f5c07cf76cc344f42612196e8669e3586b')">
-                      0x555390f5c07cf76cc344f42612196e8669e3586b
-                    </code>
-                    <el-tooltip :content="$t('copy')">
-                      <el-button circle size="small" plain @click="copyAddr('0x555390f5c07cf76cc344f42612196e8669e3586b')">
-                        <Icon icon="mdi:content-copy" width="13" height="13"/>
-                      </el-button>
-                    </el-tooltip>
-                  </div>
-                  <div class="donate-row">
-                    <span class="donate-chain trc20">TRC20</span>
-                    <code class="donate-addr" @click="copyAddr('TVqK4thJCsaaWvp1Dah9F5CFZ1iqw75f4G')">
-                      TVqK4thJCsaaWvp1Dah9F5CFZ1iqw75f4G
-                    </code>
-                    <el-tooltip :content="$t('copy')">
-                      <el-button circle size="small" plain @click="copyAddr('TVqK4thJCsaaWvp1Dah9F5CFZ1iqw75f4G')">
-                        <Icon icon="mdi:content-copy" width="13" height="13"/>
-                      </el-button>
-                    </el-tooltip>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -878,15 +818,11 @@ import {isEmail} from "@/utils/verify-utils.js";
 import loading from "@/components/loading/index.vue";
 import {getTextWidth} from "@/utils/text.js";
 import {useI18n} from 'vue-i18n';
-import axios from "axios";
 
 defineOptions({
   name: 'sys-setting'
 })
 
-const currentVersion = 'v1.0.4'
-const hasUpdate = ref(false)
-let getUpdateErrorCount = 1;
 const {t, locale} = useI18n();
 const firstLoading = ref(true)
 const accountStore = useAccountStore();
@@ -996,7 +932,6 @@ const tgMsgTextOption = [{label: t('show'), value: 'show'}, {label: t('hide'), v
 const tgMsgLabelWidth = computed(() => locale.value === 'en' ? '120px' : '100px');
 
 getSettings()
-getUpdate()
 loadGlobalToken()
 
 function loadGlobalToken() {
@@ -1030,14 +965,6 @@ async function onGenerateGlobalToken() {
 function copyGlobalToken() {
   if (!globalToken.value) return
   navigator.clipboard.writeText(globalToken.value).then(() => {
-    ElMessage.success(t('copySuccess'))
-  }).catch(() => {
-    ElMessage.error(t('copyFail'))
-  })
-}
-
-function copyAddr(addr) {
-  navigator.clipboard.writeText(addr).then(() => {
     ElMessage.success(t('copySuccess'))
   }).catch(() => {
     ElMessage.error(t('copyFail'))
@@ -1424,13 +1351,6 @@ function change(e) {
 
 function saveTitle() {
   editSetting({title: editTitle.value})
-}
-
-function jump(href) {
-  const doc = document.createElement('a')
-  doc.href = href
-  doc.target = '_blank'
-  doc.click()
 }
 
 function editSetting(settingForm, refreshStatus = true) {
@@ -2080,82 +2000,6 @@ function editSetting(settingForm, refreshStatus = true) {
     justify-content: center;
     align-items: center;
     gap: 5px;
-  }
-}
-
-.concerning-item {
-  display: flex;
-  align-items: flex-start;
-
-  .community {
-    display: flex;
-    row-gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  :deep(.el-button) {
-    padding: 0 10px;
-    font-weight: normal;
-
-    i {
-      font-size: 22px;
-    }
-  }
-
-  > span:first-child {
-    font-weight: normal;
-    padding-right: 20px;
-    white-space: nowrap;
-    padding-top: 4px;
-  }
-}
-
-.donate-box {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.donate-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-
-  .donate-chain {
-    flex-shrink: 0;
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: 5px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-
-    &.bep20 {
-      background: #FEF3C7;
-      color: #D97706;
-    }
-
-    &.trc20 {
-      background: #DCFCE7;
-      color: #16A34A;
-    }
-  }
-
-  .donate-addr {
-    flex: 1;
-    min-width: 0;
-    font-family: 'Courier New', monospace;
-    font-size: 11.5px;
-    color: var(--el-text-color-regular);
-    word-break: break-all;
-    cursor: pointer;
-    transition: color 0.15s;
-
-    &:hover {
-      color: var(--el-color-primary);
-    }
   }
 }
 
